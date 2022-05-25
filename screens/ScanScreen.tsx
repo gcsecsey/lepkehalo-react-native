@@ -3,10 +3,12 @@ import { StyleSheet, Button } from 'react-native';
 import { Text, View } from '../components/Themed';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { getBookByISBN } from '../data/moly';
+import BookCard from '../components/BookCard';
+import { Book } from '../types/Book';
 
 export default function App() {
   const [hasPermission, setHasPermission] = useState(false);
-  const [scanned, setScanned] = useState(false);
+  const [scannedBook, setScannedBook] = useState<Book | undefined>(undefined);
 
   useEffect(() => {
     (async () => {
@@ -16,21 +18,10 @@ export default function App() {
   }, []);
 
   const handleBarCodeScanned = async ({ type, data }) => {
-    setScanned(true);
-    const molyBook = await getBookByISBN(data);
+    const molyBookDetails = await getBookByISBN(data);
     // alert(`Bar code with type ${type} and data ${data} has been scanned!`);
 
-    if (molyBook === undefined) {
-      alert(`No match on Moly`);
-    } else {
-      alert(
-        `Book details:
-        ID: ${molyBook.id},  
-        Title: ${molyBook.title},
-        Author: ${molyBook.author},
-        Thumbnail: ${molyBook.cover}`
-      );
-    }
+    setScannedBook(molyBookDetails);
   };
 
   if (hasPermission === null) {
@@ -43,26 +34,13 @@ export default function App() {
   return (
     <View style={styles.container}>
       <BarCodeScanner
-        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+        onBarCodeScanned={scannedBook ? undefined : handleBarCodeScanned}
         style={StyleSheet.absoluteFillObject}
       />
-      {scanned && (
-        <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />
+      {scannedBook && (
+        // <Button title={'Tap to Scan Again'} onPress={() => setScannedBook(undefined)} />
+        <BookCard book={scannedBook} cbFn={() => setScannedBook(undefined)} />
       )}
-      {/* <BottomSheet
-        ref={bottomSheetRef}
-        index={1}
-        snapPoints={snapPoints}
-        onChange={handleSheetChanges}
-      >
-        <View style={styles.contentContainer}>
-          <Text>Awesome 🎉</Text>
-        </View>
-      </BottomSheet> */}
-
-      <View style={styles.custom}>
-        <Text>Awesome 🎉</Text>
-      </View>
     </View>
   );
 }
@@ -76,11 +54,5 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
     alignItems: 'center',
-  },
-  custom: {
-    flex: 0.2,
-    borderRadius: 20,
-    padding: 20,
-    margin: 5,
   },
 });
