@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Button } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { Text, View } from '../components/Themed';
 import { BarCodeScanner } from 'expo-barcode-scanner';
-import { getBookByISBN } from '../data/moly';
+import { getBookDetails, getBookIdByISBN } from '../data/moly';
 import BookCard from '../components/BookCard';
-import { Book } from '../types/Book';
+import { MolyBookDetails } from '../types/Book';
 
 export default function App() {
   const [hasPermission, setHasPermission] = useState(false);
-  const [scannedBook, setScannedBook] = useState<Book | undefined>(undefined);
+  const [lastScannedBook, setLastScannedBook] = useState<
+    MolyBookDetails | undefined
+  >(undefined);
+  const [lastScannedISBN, setLastScannedISBN] = useState<string | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     (async () => {
@@ -17,11 +22,24 @@ export default function App() {
     })();
   }, []);
 
-  const handleBarCodeScanned = async ({ type, data }) => {
-    const molyBookDetails = await getBookByISBN(data);
-    // alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+  const handleBarCodeScanned = async ({
+    type,
+    data,
+  }: {
+    type: string;
+    data: string;
+  }) => {
+    console.log({ type, data });
 
-    setScannedBook(molyBookDetails);
+    if (data !== lastScannedISBN) {
+      const molyBookId = await getBookIdByISBN(data);
+      if (typeof molyBookId === 'number') {
+        const molyBookDetails = await getBookDetails(molyBookId);
+        setLastScannedBook(molyBookDetails);
+      } else {
+      }
+      setLastScannedISBN(data);
+    }
   };
 
   if (hasPermission === null) {
@@ -34,12 +52,18 @@ export default function App() {
   return (
     <View style={styles.container}>
       <BarCodeScanner
-        onBarCodeScanned={scannedBook ? undefined : handleBarCodeScanned}
+        barCodeTypes={[
+          BarCodeScanner.Constants.BarCodeType.ean13,
+          BarCodeScanner.Constants.BarCodeType.ean8,
+        ]}
+        onBarCodeScanned={lastScannedBook ? undefined : handleBarCodeScanned}
         style={StyleSheet.absoluteFillObject}
       />
-      {scannedBook && (
-        // <Button title={'Tap to Scan Again'} onPress={() => setScannedBook(undefined)} />
-        <BookCard book={scannedBook} cbFn={() => setScannedBook(undefined)} />
+      {lastScannedBook && (
+        <BookCard
+          book={lastScannedBook}
+          cbFn={() => setLastScannedBook(undefined)}
+        />
       )}
     </View>
   );
