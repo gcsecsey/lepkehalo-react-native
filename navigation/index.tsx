@@ -24,7 +24,7 @@ import {
   RootStackParamList,
   RootTabParamList,
   RootTabScreenProps,
-} from '../types';
+} from '../types/navigation';
 import LinkingConfiguration from './LinkingConfiguration';
 
 export default function Navigation({
