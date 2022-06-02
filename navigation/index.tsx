@@ -79,16 +79,16 @@ function BottomTabNavigator() {
 
   return (
     <BottomTab.Navigator
-      initialRouteName="ScanHistoryScreen"
+      initialRouteName="ScanHistory"
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme].tint,
       }}
     >
       <BottomTab.Screen
-        name="ScanHistoryScreen"
+        name="ScanHistory"
         component={ScanHistoryScreen}
-        options={({ navigation }: RootTabScreenProps<'ScanHistoryScreen'>) => ({
-          title: 'Tab One',
+        options={({ navigation }: RootTabScreenProps<'ScanHistory'>) => ({
+          title: 'History',
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="history" color={color} />
           ),
