@@ -10,12 +10,9 @@ export default function ScanHistoryScreen({
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Your haven't scanned any books yet</Text>
-      <View
-        style={styles.separator}
-        lightColor="#eee"
-        darkColor="rgba(255,255,255,0.1)"
-      />
-      <EditScreenInfo path="/screens/ScanHistoryScreen.tsx" />
+      <Text style={styles.getStartedText}>
+        Go to the Scan tab to start scanning
+      </Text>
     </View>
   );
 }
@@ -29,10 +26,16 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: 'bold',
+    marginBottom: 20,
   },
   separator: {
     marginVertical: 30,
     height: 1,
     width: '80%',
+  },
+  getStartedText: {
+    fontSize: 17,
+    lineHeight: 24,
+    textAlign: 'center',
   },
 });
