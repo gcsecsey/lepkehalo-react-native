@@ -1,5 +1,6 @@
 import { MOLY_API_KEY } from 'react-native-dotenv';
 import type { MolyBookDetails } from '../types/Book';
+import { API_ROOT_URL } from '../constants/Moly';
 
 const BOOK_NOT_FOUND = 'Book not found';
 
@@ -8,7 +9,7 @@ export const getBookIdByISBN = async (isbn: string): Promise<number> => {
 
   try {
     const response = await fetch(
-      `https://moly.hu/api/book_by_isbn.json?q=${isbn}&key=${MOLY_API_KEY}`
+      `${API_ROOT_URL}/book_by_isbn.json?q=${isbn}&key=${MOLY_API_KEY}`
     );
     const json = await response.json();
 
@@ -27,7 +28,7 @@ export const getBookDetails = async (
 ): Promise<MolyBookDetails | Error> => {
   try {
     const response = await fetch(
-      `https://moly.hu/api/book/${id}.json?key=${MOLY_API_KEY}`
+      `${API_ROOT_URL}/book/${id}.json?key=${MOLY_API_KEY}`
     );
     if (response.status === 200) {
       const json = await response.json();
