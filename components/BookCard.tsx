@@ -1,33 +1,52 @@
-import { Text, View } from '../components/Themed';
-import { StyleSheet, Image, Button } from 'react-native';
+import { Text, View as ThemedView } from '../components/Themed';
+import { StyleSheet, Image, Button, View } from 'react-native';
 import { MolyBookDetails } from '../types/Book';
+import { openBrowserAsync } from 'expo-web-browser';
+import { NOT_FOUND } from '../constants/Books';
 
-export default function BookCard({
-  book: { authors, title, cover },
-  cbFn,
-}: {
-  book: MolyBookDetails;
-  cbFn: () => void;
-}) {
+export default function BookCard({ book }: { book: MolyBookDetails | string }) {
+  if (typeof book === 'string') {
+    return (
+      <ThemedView>
+        <Text>Book Not Found</Text>
+      </ThemedView>
+    );
+  }
+
   return (
-    <>
+    <ThemedView>
       <View style={styles.cardContainer}>
         <Image
           style={styles.coverImg}
           source={{
-            uri: cover,
+            uri: book.cover,
           }}
         />
         <View style={styles.textContainer}>
-          <Text style={styles.titleText}>{title}</Text>
+          <Text style={styles.titleText}>{book.title}</Text>
           <Text style={styles.authorText}>
-            {authors.map((a) => a.name).join(' - ')}
+            {book.authors.map((a) => a.name).join(' - ')}
           </Text>
+          <Button title={'Most olvasom'} onPress={() => handleRead(book.id)} />
+          <Button title={'Megszereztem'} onPress={() => handleOwn(book.id)} />
         </View>
       </View>
-      <Button title={'Tap to Scan Again'} onPress={cbFn} />
-    </>
+      {/* <Button title={'Tap to Scan Again'} onPress={cbFn} /> */}
+    </ThemedView>
   );
+}
+
+export function handleRead(id: number) {
+  openBrowserAsync('https://moly.hu/olvasasok/uj?book_id=' + id, {
+    browserPackage: 'com.android.chrome',
+  });
+}
+
+export function handleOwn(id: number) {
+  console.log('own');
+  openBrowserAsync('https://moly.hu/magankonyvtar/uj?book_id=' + id, {
+    browserPackage: 'com.android.chrome',
+  });
 }
 
 const styles = StyleSheet.create({

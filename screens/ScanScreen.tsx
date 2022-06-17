@@ -1,19 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import { openBrowserAsync } from 'expo-web-browser';
+import { View as RNView } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet } from 'react-native';
 import { Text, View } from '../components/Themed';
-import { BarCodeScanner } from 'expo-barcode-scanner';
-import { getBookDetails, getBookIdByISBN } from '../data/moly';
+import { BarCodeScanner, BarCodeScannerResult } from 'expo-barcode-scanner';
+import {
+  getBookDetails,
+  getBookIdByISBN,
+  getBookDetailsByISBN,
+} from '../data/moly';
 import BookCard from '../components/BookCard';
 import { MolyBookDetails } from '../types/Book';
+import { addBook } from '../data/scanHistory';
+import { NOT_FOUND } from '../constants/Books';
 
 export default function App() {
   const [hasPermission, setHasPermission] = useState(false);
   const [lastScannedBook, setLastScannedBook] = useState<
-    MolyBookDetails | undefined
+    MolyBookDetails | undefined | string
   >(undefined);
-  const [lastScannedISBN, setLastScannedISBN] = useState<string | undefined>(
-    undefined
-  );
+  const [lastScannedISBN, setLastScannedISBN] = useState<string>('');
+  const [scanned, setScanned] = useState<string>('');
 
   useEffect(() => {
     (async () => {
@@ -22,24 +29,29 @@ export default function App() {
     })();
   }, []);
 
-  const handleBarCodeScanned = async ({
-    type,
-    data,
-  }: {
-    type: string;
-    data: string;
-  }) => {
-    console.log({ type, data });
+  const handleBarCodeScanned = async ({ type, data }: BarCodeScannerResult) => {
+    // stop scanning for more barcodes
+    setScanned(data);
 
     if (data !== lastScannedISBN) {
-      const molyBookId = await getBookIdByISBN(data);
-      if (typeof molyBookId === 'number') {
-        const molyBookDetails = await getBookDetails(molyBookId);
-        setLastScannedBook(molyBookDetails);
-      } else {
-      }
       setLastScannedISBN(data);
+
+      const molyBookDetails = await getBookDetailsByISBN(data);
+      if (molyBookDetails instanceof Error) {
+        setLastScannedBook(NOT_FOUND);
+      } else {
+        let result = await openBrowserAsync(molyBookDetails.url, {
+          browserPackage: 'com.android.chrome',
+        });
+
+        setLastScannedBook(molyBookDetails);
+      }
+    } else {
+      console.log('This book has just been scanned, scanning again...');
     }
+
+    // continue scanning for barcodes
+    setScanned('');
   };
 
   if (hasPermission === null) {
@@ -56,15 +68,10 @@ export default function App() {
           BarCodeScanner.Constants.BarCodeType.ean13,
           BarCodeScanner.Constants.BarCodeType.ean8,
         ]}
-        onBarCodeScanned={lastScannedBook ? undefined : handleBarCodeScanned}
+        onBarCodeScanned={!scanned ? handleBarCodeScanned : undefined}
         style={StyleSheet.absoluteFillObject}
       />
-      {lastScannedBook && (
-        <BookCard
-          book={lastScannedBook}
-          cbFn={() => setLastScannedBook(undefined)}
-        />
-      )}
+      {lastScannedBook && <BookCard book={lastScannedBook} />}
     </View>
   );
 }
