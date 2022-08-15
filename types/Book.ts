@@ -14,3 +14,6 @@ export type MolyBookDetails = {
   citations_count: number;
   year_of_publishing: number;
 };
+
+// date string => book details
+export type BookScanHistory = Array<MolyBookDetails & { date: Date }>;
