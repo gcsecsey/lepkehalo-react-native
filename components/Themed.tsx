@@ -3,6 +3,7 @@
  * https://docs.expo.io/guides/color-schemes/
  */
 
+import { SimpleLineIcons } from '@expo/vector-icons';
 import { Text as DefaultText, View as DefaultView } from 'react-native';
 
 import Colors from '../constants/Colors';
@@ -45,4 +46,10 @@ export function View(props: ViewProps) {
   );
 
   return <DefaultView style={[{ backgroundColor }, style]} {...otherProps} />;
+}
+
+export function Icon(props: React.ComponentProps<typeof SimpleLineIcons>) {
+  const color = useThemeColor({}, 'text');
+
+  return <SimpleLineIcons color={color} {...props} />;
 }
