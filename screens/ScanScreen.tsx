@@ -40,9 +40,9 @@ export default function App() {
       if (molyBookDetails instanceof Error) {
         setLastScannedBook(NOT_FOUND);
       } else {
-        let result = await openBrowserAsync(molyBookDetails.url, {
-          browserPackage: 'com.android.chrome',
-        });
+        // let result = await openBrowserAsync(molyBookDetails.url, {
+        //   browserPackage: 'com.android.chrome',
+        // });
 
         setLastScannedBook(molyBookDetails);
       }

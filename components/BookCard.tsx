@@ -9,7 +9,11 @@ import {
   ADD_NEW_BOOK_URL,
   ADD_NEW_COPY_URL,
   ADD_NEW_READ_URL,
+  ADD_TO_WAITLIST_URL,
+  ADD_TO_WISHLIST_URL,
+  ADD_TO_SHELF_URL,
 } from '../constants/Moly';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function BookCard({ book }: { book: MolyBookDetails | string }) {
   if (typeof book === 'string') {
@@ -44,13 +48,55 @@ export default function BookCard({ book }: { book: MolyBookDetails | string }) {
           <Text style={styles.authorText}>
             {book.authors.map((a) => a.name).join(' - ')}
           </Text>
-          <Button
-            title={'New read'}
-            onPress={() => openTabAsync(ADD_NEW_READ_URL + book.id)}
+          <MaterialCommunityIcons
+            name="bookmark-plus-outline"
+            size={25}
+            color="white"
+            style={{ marginRight: 15 }}
           />
           <Button
-            title={'New copy'}
+            title={'Olvasom'}
+            onPress={() => openTabAsync(ADD_NEW_READ_URL + book.id)}
+          />
+          <MaterialCommunityIcons
+            name="book-plus-outline"
+            size={25}
+            color="white"
+            style={{ marginRight: 15 }}
+          />
+          <Button
+            title={'Megszereztem'}
             onPress={() => openTabAsync(ADD_NEW_COPY_URL + book.id)}
+          />
+          <MaterialCommunityIcons
+            name="timer-sand"
+            size={25}
+            color="white"
+            style={{ marginRight: 15 }}
+          />
+          <Button
+            title={'Várólista'}
+            onPress={() => openTabAsync(ADD_TO_WAITLIST_URL + book.id)}
+          />
+          <MaterialCommunityIcons
+            name="cards-heart-outline"
+            size={25}
+            color="white"
+            style={{ marginRight: 15 }}
+          />
+          <Button
+            title={'Kívánságlista'}
+            onPress={() => openTabAsync(ADD_TO_WISHLIST_URL + book.id)}
+          />
+          <MaterialCommunityIcons
+            name="bookshelf"
+            size={25}
+            color="white"
+            style={{ marginRight: 15 }}
+          />
+          <Button
+            title={'Polc'}
+            onPress={() => openTabAsync(ADD_TO_SHELF_URL + book.id)}
           />
         </View>
       </View>
